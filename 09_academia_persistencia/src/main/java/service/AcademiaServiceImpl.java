@@ -3,6 +3,7 @@ package service;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -29,7 +30,8 @@ public class AcademiaServiceImpl implements AcademiaService {
 	EntityManager entityManager;
 
 	/**
-	 * Método que da de alta un alumno que no existe en la bbdd (que no coincida el nombre)
+	 * Método que da de alta un alumno que no existe en la bbdd (que no coincida el
+	 * nombre)
 	 * 
 	 * @param Recibe un parametro a , es el alumno a dar de alta
 	 */
@@ -51,12 +53,14 @@ public class AcademiaServiceImpl implements AcademiaService {
 	@Override
 	public List<Alumno> buscar(String curso) {
 		String jpql = "select a from Alumno a where a.curso=:curso";
+		//Otra forma: String jpql="select a from Alumno a where a.curso=?1";
 		TypedQuery<Alumno> qr = entityManager.createQuery(jpql, Alumno.class);
+		//De la otra forma: qr.setParameter(1,curso);
 		qr.setParameter("curso", curso);
 		// No hay que hacer casting
 		List<Alumno> alumnos = qr.getResultList();
 
-		return alumnos;
+		return alumnos.size() > 0 ? alumnos : null;
 	}
 
 	/**
@@ -70,7 +74,7 @@ public class AcademiaServiceImpl implements AcademiaService {
 		TypedQuery<String> qr = entityManager.createQuery(jpql, String.class);
 		// No hay que hacer casting
 		List<String> cursos = qr.getResultList();
-		return cursos;
+		return cursos.size() > 0 ? cursos : null;
 	}
 
 	/**
@@ -84,7 +88,13 @@ public class AcademiaServiceImpl implements AcademiaService {
 		String jpql = "select a from Alumno a where nombre=:nombre";
 		Query qr = entityManager.createQuery(jpql);
 		qr.setParameter("nombre", a.getNombre());
-		return (Alumno) qr.getSingleResult();
+		Alumno alumno = null;
+		try {
+			alumno = (Alumno) qr.getSingleResult(); //Si el alumno existe devuelve el alumno y sino devuelve null
+		} catch (NoResultException nre) {
+			// Ignore this because as per your logic this is ok!
+		}
+		return alumno;
 	}
 
 }

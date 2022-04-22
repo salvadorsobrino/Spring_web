@@ -28,14 +28,26 @@ public class AcademiaServiceImpl implements AcademiaService {
 	@PersistenceContext
 	EntityManager entityManager;
 
+	/**
+	 * Método que da de alta un alumno que no existe en la bbdd (que no coincida el nombre)
+	 * 
+	 * @param Recibe un parametro a , es el alumno a dar de alta
+	 */
 	@Transactional // Utilizamos la de Spring NO la de javax.persistence
 	@Override
 	public void alta(Alumno a) {
-		entityManager.persist(a); // Entidad(no columnas) y Objeto. Abre y cierra una transaccion.
-		// JpaTransactionManager
-
+		if (buscarNombre(a) == null) {
+			entityManager.persist(a); // Entidad(no columnas) y Objeto. Abre y cierra una transaccion.
+			// JpaTransactionManager
+		}
 	}
 
+	/**
+	 * Método que devuelve una lista de los alumnos del mismo curso
+	 * 
+	 * @param Recibe un String curso que es curso a buscar
+	 * @return Devuelve la lista de alumnos
+	 */
 	@Override
 	public List<Alumno> buscar(String curso) {
 		String jpql = "select a from Alumno a where a.curso=:curso";
@@ -47,6 +59,11 @@ public class AcademiaServiceImpl implements AcademiaService {
 		return alumnos;
 	}
 
+	/**
+	 * Método que busca los distintos cursos que existen
+	 * 
+	 * @return Devuelve la lista de cursos distintos
+	 */
 	@Override
 	public List<String> buscarCursos() {
 		String jpql = "select distinct(a.curso) from Alumno a";
@@ -56,6 +73,12 @@ public class AcademiaServiceImpl implements AcademiaService {
 		return cursos;
 	}
 
+	/**
+	 * Método para buscar por nombre a un alumno
+	 * 
+	 * @param recibe el alumno a buscar
+	 * @return devuelve el alumno
+	 */
 	@Override
 	public Alumno buscarNombre(Alumno a) {
 		String jpql = "select a from Alumno a where nombre=:nombre";

@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import model.Producto;
@@ -30,7 +31,8 @@ public class TiendaServiceImpl implements TiendaService {
 	@PersistenceContext
 	EntityManager entityManager;
 
-	@Transactional // Utilizamos la de Spring NO la de javax.persistence
+	@Transactional(propagation = Propagation.REQUIRED) //Por defecto es required. Admite una transacción actual, crea una nueva si no existe ninguna. 
+	// Utilizamos la de Spring NO la de javax.persistence
 	@Override
 	public void alta(Producto p) {
 		entityManager.persist(p); // Entidad(no columnas) y Objeto. Abre y cierra una transaccion.
@@ -67,6 +69,15 @@ public class TiendaServiceImpl implements TiendaService {
 		qr.setParameter("precio", precio);
 		qr.setParameter("nombre", nombre);
 		qr.executeUpdate();
+		
+		/*
+		 * Producto producto = buscarProducto(nombre);
+		 * if (producto != null){
+		 * 		producto.setPrecio(nuevoPrecio);
+		 * 		entityManager.merge(producto); //Actualizacion
+		 * }
+		 * 
+		 * */
 
 
 	}
@@ -78,7 +89,11 @@ public class TiendaServiceImpl implements TiendaService {
 		// qr.setParameter("seccion", seccion);
 		// casting al tipo de colección específica
 		// List<Producto> productos = (List<Producto>) qr.getResultList();
-
+		
+		//Implementar @NamedQuery(name="Producto.findBySeccion", query="select p from Producto p where p.seccion=:seccion")
+		//TypedQuery<Producto> qr = entityManager.createNamedQuery("Producto.findBySeccion", Producto.class);
+		//qr.setParameter("seccion", seccion);
+		
 		String jpql = "select p from Producto p where p.seccion=:seccion";
 		TypedQuery<Producto> qr = entityManager.createQuery(jpql, Producto.class);
 		qr.setParameter("seccion", seccion);
@@ -91,6 +106,14 @@ public class TiendaServiceImpl implements TiendaService {
 	@Override
 	public Producto buscarProducto(int idProducto) {
 		return entityManager.find(Producto.class, idProducto);
+	}
+
+	@Override
+	public double precioMedioSeccion(String seccion) {
+		String jpql="select avg(p.precio) from Producto p where p.seccion=:sec";
+		TypedQuery<Double> qr = entityManager.createQuery(jpql, Double.class);
+		qr.setParameter("sec", seccion);
+		return qr.getSingleResult();
 	}
 
 }

@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table; 
 
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ import lombok.Setter;
 
 @Entity //Entidad de datos que se va a mapear a una base de datos
 @Table(name="productos") //Indica nombre de la tabla, a traves del atributo name
-
+@NamedQuery(name="Producto.findBySeccion", query="select p from Producto p where p.seccion=:seccion")
 public class Producto {
 	@Id //Primary key
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // Llave primaria autogenerada , informa al framework que es una llave primaria autogenerada 

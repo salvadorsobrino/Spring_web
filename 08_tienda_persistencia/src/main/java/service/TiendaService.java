@@ -11,4 +11,5 @@ public interface TiendaService {
 	void modificar(String nombre,Double precio); 
 	List <Producto> buscar(String seccion);
 	Producto buscarProducto(int idProducto);
+	double precioMedioSeccion(String seccion);
 }

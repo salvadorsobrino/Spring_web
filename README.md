@@ -17,3 +17,10 @@ alumno no exista, porque si ya existe no se grabará.
 
 Consultar alumnos por curso: Aparece una página con una lista desplegable en el que aparecen los cursos, al seleccionar un curso, se mostrará en la misma
 página una tabla con los datos de los alumnos de dicho curso
+
+11.- Partiendo de la capa de persistencia de formacion, queremos incorporar las siguiente funcionalidades:
+- Validar usuarios. Dada usuario y contraseña, obtener los datos del alumno
+- Cursos de un alumno. A partir del usuario, obtener la lista de cursos en donde está matriculado en alumno
+- Lista de cursos
+- Alumnos por curso. A partir de un nombre de curso, se devuelve los alumnos matriculados en dicho curso
+- Matricular alumno. A partir del usuario e idCurso, el alumno se matriula en dicho curso

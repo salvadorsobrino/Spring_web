@@ -1,0 +1,139 @@
+package controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import model.Alumno;
+import model.Curso;
+import service.FormacionService;
+
+@CrossOrigin("*")
+@Controller
+public class FormacionController {
+	@Autowired
+	FormacionService fs;
+
+	@PostMapping(value = "Login")
+	public String login(@RequestParam("usuario") String usuario, @RequestParam("password") String password,
+			HttpSession session, HttpServletRequest request) {
+		Alumno alumno = fs.validarUsuario(usuario, password);
+		if (alumno != null) {
+			session.setAttribute("alumno", alumno);
+			return "menu";
+		} else {
+			request.setAttribute("mensaje", "Usuario o contraseña incorrectos");
+			return "login";
+		}
+
+	}
+
+	@GetMapping(value = "AlumnosCursos", produces = MediaType.APPLICATION_JSON_VALUE) // Peticion que llega al
+																						// Controller
+	public @ResponseBody List<Alumno> alumnosCursos(@RequestParam("nombreCurso") String nombreCurso) {
+		// HttpServletRequest request para guardar atributos en la respuesta
+		return fs.alumnosCurso(nombreCurso);
+	}
+
+	@GetMapping(value = "CursosAlumnos", produces = MediaType.APPLICATION_JSON_VALUE) // Peticion que llega al
+																						// Controller
+	public @ResponseBody List<Curso> cursosAlumnos(@RequestParam("nombre") String nombre) {
+		return fs.obtenerCursos(nombre);
+	}
+
+	@GetMapping(value = "Alumnos", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody List<Alumno> alumnos() {
+		return fs.listaAlumnos();
+	}
+
+	@GetMapping(value = "Cursos", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody List<Curso> cursos() {
+		return fs.listaCursos();
+	}
+	/*
+	 * Could not write JSON: failed to lazily initialize a collection of role:
+	 * model.Alumno.cursos, could not initialize proxy - no Session; nested
+	 * exception is com.fasterxml.jackson.databind.JsonMappingException: failed to
+	 * lazily initialize a collection of role: model.Alumno.cursos, could not
+	 * initialize proxy - no Session (through reference chain:
+	 * java.util.ArrayList[0]->model.Alumno["cursos"])
+	 */
+
+	/*
+	 * Cerró la sesion no ha podido trae los cursos (lazy). La solución no es eager,
+	 * es cambiar un aspecto de la configuracion para que no cierre la sesion
+	 * (solucion parcial) luego tendremos bucle infinito ServiceConfig
+	 * props.put("hibernate.enable_lazy_load_no_trans", true); (SOLUCION PARCIAL)
+	 */
+
+	/*
+	 * La solucion: hacer el JSON evitando que se manden los objetos de tipo
+	 * coleccion que a su vez estan relacionados para asi evitar los bucles
+	 * infinitos. Los datos de coleccion evitarlos transformar a JSON. Con una
+	 * notacion de la libreria jackson que es la utiliza Spring @JsonIgnore delante
+	 * del atributo
+	 */
+	@PostMapping(value = "AltaAlumno")
+	public String insertarAlumno(@ModelAttribute Alumno a) {
+		fs.altaAlumno(a);
+		return "menu";
+	}
+
+	@PostMapping(value = "AltaCurso")
+	public String insertarCurso(@ModelAttribute Curso c) {
+		fs.altaCurso(c);
+		return "menu";
+	}
+
+	@GetMapping(value = "CursosNoMatriculados", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody List<Curso> cursosNoMatriculados(@RequestParam("usuario") String usuario) {
+		return fs.listaCursosNoMatriculados(usuario);
+	}
+
+	/*@GetMapping(value = "CursosEntreFechas", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody List<Curso> cursosEntreFechas(@RequestParam("fecha1") String d1,
+			@RequestParam("fecha2") String d2) {
+
+		//SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd"); //ISO 8601 
+		Date dateFormateada1;
+		Date dateFormateada2;
+		try {
+			
+			dateFormateada1 = formato.parse(d1);
+			dateFormateada2 = formato.parse(d2);
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return fs.consultarMatriculas(dateFormateada1, dateFormateada2);
+
+	}*/
+	
+	@GetMapping(value = "CursosEntreFechas", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody List<Curso> cursosEntreFechas(@RequestParam("fechaIni") @DateTimeFormat(pattern = "yyyy-MM-dd") Date d1,
+			@RequestParam("fechaFin") @DateTimeFormat(pattern = "yyyy-MM-dd")Date d2) {
+		//@DateTimeFormat Se recogen como String los parametros pero al poner esta notacion se recoge como Date
+		return fs.consultarMatriculas(d1, d2);
+		
+		//Faltan cosas que necesitamos (Mañana lo vemos)
+	}
+
+}

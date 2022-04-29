@@ -1,0 +1,10 @@
+#centrado{
+  width: 50%;
+  border-style: solid;
+  border-color: orange;
+  border-width: thin;
+  margin-left: 25%;
+  padding: 1%;
+  background-color: rgb(250, 255, 159);
+  text-align: center;
+}

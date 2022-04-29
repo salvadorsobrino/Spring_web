@@ -13,7 +13,7 @@ import model.Alumno;
 import model.Curso;
 @Repository //Mismo objetivo que @Service pero en clases DAO (es otra capa). Tienes que instanciar esta clase.
 public class AlumnosDaoImpl implements AlumnosDao {
-	@PersistenceContext
+	@PersistenceContext(unitName="formacionPU") //Es redundante, necesario cuando hay más de una BBDD
 	EntityManager entityManager;
 
 	@Override

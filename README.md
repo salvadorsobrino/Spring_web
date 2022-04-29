@@ -24,3 +24,13 @@ página una tabla con los datos de los alumnos de dicho curso
 - Lista de cursos
 - Alumnos por curso. A partir de un nombre de curso, se devuelve los alumnos matriculados en dicho curso
 - Matricular alumno. A partir del usuario e idCurso, el alumno se matriula en dicho curso
+
+13.-Aplicación formación completa:
+- Alta de alumnos. Debe permitir grabar nuevos alumnos, pero sin repetir usuario
+- Alta de cursos. Permite grabar nuevos cursos, pero no debe permitir repetir nombre de curso
+- Matricular alumnos. Aparece la lista de alumnos para elegir el alumno a matricular. Una vez elegido
+en la misma página se le pide mediate otra lista que elija el curso donde se le va a matricualar. En esta
+lista, solo deben aparecer los cursos en los que el alumno no está matriculado
+- Consulta de matriculas. Selecionamos rango de fechas y se muestra las matriculas de todos los cursos
+comenzados entre ese rango de fechas. Se muestra nombre del curso, nombre del alumno y fecha de inicio de ese
+curso

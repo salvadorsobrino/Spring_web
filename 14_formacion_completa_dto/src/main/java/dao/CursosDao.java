@@ -21,6 +21,6 @@ public interface CursosDao extends JpaRepository<Curso, Integer> {
 	//"select c from Curso c where c Not In (Select c From Curso c join c.alumnos a Where a.usuario=?1)"
 	List<Curso>cursosNoMatriculados(String usuario);
 	List<Curso>findByFechaInicioBetween(Date desde, Date hasta);
-	//select from Curso c where c.fechaInicio BETWEEN desde AND hasta
-	//No hace falta query gracias a la palabra between
+	//select c from Curso c where c.fechaInicio between ?1 and ?2
+	//No hace falta query gracias a la palabra reservada between
 }
